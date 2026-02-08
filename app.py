@@ -24,9 +24,9 @@ def transform_text(text):
 
     text = y[:]
     y.clear()
-
+    stop_words = set(stopwords.words('english'))
     for i in text:
-        if i not in stopwords.words('english') and i not in string.punctuation:
+        if i not in stop_words and i not in string.punctuation:
             y.append(i)
 
     text = y[:]
@@ -37,16 +37,22 @@ def transform_text(text):
 
     return " ".join(y)
 
+# Load model and vectorizer
+with open('vectorizer.pkl', 'rb') as f:
+    tfidf = pickle.load(f)
 
-tfidf = pickle.load(open('vectorizer.pkl','rb'))
-model = pickle.load(open('model.pkl','rb'))
+with open('model.pkl', 'rb') as f:
+    model = pickle.load(f)
 
 st.title("Email/SMS Spam Classifier")
 
 input_sms = st.text_area("Enter the message")
 
 if st.button('Predict'):
-    # 1. Preprocess
+    if input_sms.strip() == "":
+        st.warning("Please enter a message to classify.")
+    else:
+         # 1. Preprocess
     transformed_sms = transform_text(input_sms)
 
     # 2. Vectorize
@@ -60,4 +66,6 @@ if st.button('Predict'):
         st.header("Spam")
     else:
         st.header("Not Spam")
+   
+
 
